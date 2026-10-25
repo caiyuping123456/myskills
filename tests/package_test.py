@@ -25,10 +25,12 @@ class PackageTests(unittest.TestCase):
             (a / 'profile').mkdir(); (a / 'profile/Cookies').write_text('private')
             output = Path(tmp) / 'dist'
             files = module.package(repo, output)
-            self.assertEqual({p.name for p in files}, {'skill-demo.zip','demo.zip'})
+            self.assertEqual({p.name for p in files}, {'skill-demo.zip','skill-demo-flat.zip','chrome-extension-demo.zip'})
             with ZipFile(output / 'skill-demo.zip') as z:
                 self.assertEqual(set(z.namelist()), {'demo/SKILL.md','demo/scripts/config.example.json'})
-            with ZipFile(output / 'demo.zip') as z:
+            with ZipFile(output / 'skill-demo-flat.zip') as z:
+                self.assertEqual(set(z.namelist()), {'SKILL.md','scripts/config.example.json'})
+            with ZipFile(output / 'chrome-extension-demo.zip') as z:
                 self.assertEqual(z.namelist(), ['manifest.json'])
 
 if __name__ == '__main__':

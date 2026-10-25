@@ -73,8 +73,9 @@ unzip it and load the folder via `chrome://extensions`.
 
 ## Download the correct package
 
-- `boss-job-apply.zip`: Chrome/Edge extension; manifest.json at archive root.
-- `skill-boss-job-apply.zip`: portable Agent Skill; extract the whole boss-job-apply folder for your coding agent. No Codex installation or OpenAI API is required. Local terminal/browser access is required.
+- `chrome-extension-boss-job-apply.zip`: **Chrome/Edge 插件**，manifest.json 在压缩包根目录。它没有 SKILL.md，不能用于安装 Skill。
+- `skill-boss-job-apply.zip`: **标准 Agent Skill 包**，解压后是 `boss-job-apply/SKILL.md`。优先使用这个。
+- `skill-boss-job-apply-flat.zip`: **兼容包**，`SKILL.md` 直接在压缩包根目录；如果标准包报 `NO_SKILLS_IN_ZIP`，改用这个。
 
 ### Agent import examples
 

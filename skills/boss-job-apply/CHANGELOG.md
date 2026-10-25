@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.2 - 2026-10-25
+
+- Renamed the browser-extension asset to `chrome-extension-boss-job-apply.zip`
+  so it cannot be mistaken for a Skill package.
+- Added `skill-boss-job-apply-flat.zip` as a compatibility fallback with
+  `SKILL.md` at the archive root.
+- Documented the `NO_SKILLS_IN_ZIP` failure mode and correct package choices.
+
 ## 1.2.0 - 2026-10-25
 
 - Added Excel (.xlsx) delivery summary export with 11 columns:

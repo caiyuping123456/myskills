@@ -93,3 +93,10 @@ node scripts/export-excel.mjs scripts/out/apply-progress.json --output "D:\桌�
 状态包括：已投递（已确认）、已投递（未确认）、未确认（聊天列表未找到）、失败、已沟通过、仅支持官网投递、试运行（未发送）、跳过（公司规模/学历/薪资）。
 
 导出脚本不会读取浏览器 Cookie、账号密码或聊天内容，只读取本地 `apply-progress.json`。
+
+
+## 安装包怎么选
+
+- 安装 **Skill**：用 `skill-boss-job-apply.zip`（标准目录）或 `skill-boss-job-apply-flat.zip`（根目录 SKILL.md 兼容版）。
+- 安装 **浏览器插件**：用 `chrome-extension-boss-job-apply.zip`，不要拿去安装 Skill。
+- 如果 Skill 安装器报 `NO_SKILLS_IN_ZIP`，先确认没有误选 Chrome 插件包；仍失败则改用 flat 版。
