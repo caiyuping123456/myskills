@@ -1,5 +1,6 @@
 {
   "greeting": "您好，我是27届本科，求职Java后端/全栈/Agent开发。有两段后端实习，熟悉Spring Boot、MySQL、Redis。方便发您简历看看吗？",
+  "greetingNote": "点击立即沟通时发出的其实是 BOSS 账号里保存的默认招呼语。运行前请把 App 里的默认招呼语改成与上一行一致，否则实际发出的内容会与这里不同。",
   "targetCount": 50,
   "cities": [
     { "code": "101280600", "name": "深圳" },
@@ -22,14 +23,19 @@
   "titleInclude": ["java"],
   "freshnessPattern": "2027|2026|实习|校招|应届|在校|秋招|转正",
   "companySizeAllow": ["20-99人", "100-499人", "500-999人"],
+  "educationAllow": ["本科", "学历不限"],
   "dailyPayFloor": 200,
   "campusMonthlyFloorK": 7,
-  "salaryMode": "rangeMax",
+  "salaryMode": "rangeMin",
   "blockedCompanies": [
     "腾讯", "字节", "华为", "快手", "京东", "特斯拉", "蔚来", "大疆", "迈瑞",
     "美团", "阿里巴巴", "网易", "百度", "小米", "OPPO", "vivo", "拼多多",
     "滴滴", "中兴", "小红书", "顺丰", "深信服", "亚信", "高途", "长亮科技",
     "海康", "中国移动", "中国电信", "中国联通"
+  ],
+  "blockedCompanyPatterns": [
+    "淘宝", "天猫", "蚂蚁", "闲鱼", "阿里",
+    "中软国际", "中科软", "太极股份", "软通", "博彦", "中电金信"
   ],
   "outputDir": "./out"
 }

@@ -187,16 +187,24 @@
     return await D.waitForDetail(D.readCard(card), { cancelled: () => state.stop });
   }
 
-  async function sendGreeting(message) {
+  // Clicking 立即沟通 already sends the account's saved greeting. There is no
+  // typing step, and typing here would deliver a second message.
+  async function sendGreeting() {
     await waitWhilePaused();
     if (state.stop) return 'stopped';
-    const btn = D.findButtonByText(D.SELECTORS.chatButtonText, D.selectedRoot() || document);
+    const root = D.selectedRoot() || document;
+    const external = D.findButtonByText(['立即网申'], root);
+    if (external) return 'external-application-only';
+    const already = D.findButtonByText(['继续沟通'], root);
+    if (already) return 'already-sent';
+    const btn = D.findButtonByText(['立即沟通'], root);
     if (!btn) return 'no-chat-button';
     btn.click();
+    // A click alone is not proof of delivery; the caller checks the chat list.
     await wait(4500);
     await waitWhilePaused();
     if (state.stop) return 'stopped';
-    return await D.typeAndSend(message);
+    return 'submitted-unverified';
   }
 
   async function run() {
@@ -249,7 +257,7 @@
           await waitWhilePaused();
           if (state.stop) break;
           log('已核验学历：' + detail.education + ' · ' + job.title);
-          const result = await sendGreeting(c.greeting);
+          const result = await sendGreeting();
           if (result === 'sent' || result === 'already-sent') {
             state.sent++;
             log('已发送 ' + job.company + ' · ' + job.title + ' (' + decision.why + ')', 'ok');

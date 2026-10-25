@@ -4,7 +4,12 @@
   const SELECTORS = {
     jobCard: '.job-card-box', jobDetailLink: 'a.job-name, a[href*="/job_detail/"]',
     detail: '.job-detail-container, .job-detail-box, .job-banner',
-    chatButtonText: ['立即沟通', '继续沟通'], chatInput: 'textarea.input', chatSend: 'button.btn-send',
+    // The editor is a contenteditable div, not a textarea; it only exists once a
+    // conversation is selected.
+    chatButtonText: ['立即沟通', '继续沟通', '立即网申'],
+    chatInput: 'div.chat-input[contenteditable="true"]',
+    chatSend: 'button.btn-send',
+    conversationRow: 'li[role="listitem"]',
   };
   const text = (el) => (el && (el.innerText || el.textContent) || '').trim();
   function listCards() { return Array.from(document.querySelectorAll(SELECTORS.jobCard)); }
@@ -63,10 +68,16 @@
   async function typeAndSend(message) {
     const input = document.querySelector(SELECTORS.chatInput);
     if (!input) return 'no-input';
-    const setter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value').set;
-    setter.call(input, message);
-    input.dispatchEvent(new Event('input', { bubbles: true }));
-    input.dispatchEvent(new Event('change', { bubbles: true }));
+    // contenteditable div: focus, insert, then dispatch input so Vue sees it.
+    input.focus();
+    const sel = window.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(input);
+    range.collapse(false);
+    sel.removeAllRanges();
+    sel.addRange(range);
+    document.execCommand('insertText', false, message);
+    input.dispatchEvent(new InputEvent('input', { bubbles: true, data: message, inputType: 'insertText' }));
     await sleep(500);
     const send = document.querySelector(SELECTORS.chatSend);
     if (!send || send.disabled || send.classList.contains('disabled')) return 'no-send-button';

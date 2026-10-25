@@ -45,31 +45,90 @@ page instead** — it appears in the "公司基本信息" block as one of:
 
 ## Job detail
 
-- Chat button text: **立即沟通** (new) or **继续沟通** (already contacted)
+- Chat button: `a.btn-startchat` (two of them, same label). Labels:
+  - **立即沟通** — not contacted yet; clicking it sends the greeting
+  - **继续沟通** — this recruiter was already contacted
+  - **立即网申** — external application form; there is **no** chat button on
+    this page at all, so the job cannot be messaged
 - Company size: matched from body text via the size regex above
 - Salary: `300-400元/天`, `200元/天`, or `10-15K`
+- Education: exact label from the header tag list
+  (`学历不限|初中及以下|中专/中技|高中|大专|本科|硕士|博士`). Do not read it from
+  the description body, and treat more than one match as unknown.
 
-Clicking the chat button **navigates that same tab** to `/web/geek/chat` and may
-spawn a second chat tab.
+Clicking 立即沟通 **navigates that same tab** to `/web/geek/chat` and may spawn a
+second chat tab.
 
-## Chat / sending the greeting
+## Sending: 立即沟通 sends immediately
 
-After clicking 立即沟通 the greeting is sometimes auto-sent (the message appears in
-the conversation) and sometimes not. Handle both:
+**Clicking 立即沟通 is the send.** It delivers the account's saved default
+greeting without any confirmation step or typing. Verified over a 100+ job run:
+there is no text box involved in the normal path.
 
-- Input: `textarea.input`
-- Send button: `button.btn-send` (class also contains `disabled` until text is present)
-- Detect auto-send: conversation body already contains part of the greeting
+Consequences to design around:
 
-To type reliably, set the value through the native setter, then dispatch
-`input` and `change` events so Vue picks it up:
+- `config.greeting` does **not** control the text. The wording comes from the
+  account's saved greeting in the BOSS app. Check they match before a run, or
+  the script will silently send something else.
+- Do not "fix" a failed send by typing into the chat and clicking send — that
+  would deliver a **second** message to a recruiter who already got one.
+- Treat `继续沟通` as already done. Clicking it only opens the existing chat.
+
+## Chat page: the editor only exists after selecting a conversation
+
+- Conversation rows: `li[role="listitem"]` (40 per page load). **Not**
+  `.chat-user-list li` — that selector matches nothing.
+- Each row's text: `HH:MM <recruiter><company><role> [送达|已读|未读] <preview>`
+- With no conversation selected — the default state after page load — there is
+  **no message editor in the DOM at all** (`[contenteditable]` count is 0,
+  `textarea` count is 0). Scripted and CDP mouse clicks on a row were both
+  observed to do nothing, so do not rely on selecting a conversation
+  programmatically.
+- The three `iframe` elements on the page are 0×0 `about:blank` placeholders.
+  The chat UI is in the main document; frame targeting is unnecessary.
+
+Editor structure, if a conversation is ever open (selectors confirmed present on
+the page while a recruiter has an active thread):
+
+- Input: `div.chat-input[contenteditable="true"]` — a contenteditable div, **not**
+  a `textarea`. The old `textarea.input` selector matches nothing.
+- Send button: `button.btn-send`, carrying `disabled` in its class list until the
+  editor has content.
+
+Typing, if genuinely needed, must use `execCommand('insertText')` plus an
+`input` event so the framework registers the change:
 
 ```js
-const setter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value').set;
-setter.call(textarea, message);
-textarea.dispatchEvent(new Event('input', { bubbles: true }));
-textarea.dispatchEvent(new Event('change', { bubbles: true }));
+el.focus();
+document.execCommand('insertText', false, message);
+el.dispatchEvent(new InputEvent('input', { bubbles: true, data: message, inputType: 'insertText' }));
 ```
+
+## Verifying delivery
+
+A click is not proof. Confirm against the conversation list:
+
+1. Reload the chat tab (`location.reload()`) so the list is fresh.
+2. Find the row for the company (`li[role="listitem"]` text contains the name).
+3. Require a `[送达]` or `[已读]` marker in that row.
+
+Match on the full company name where possible. BOSS rows often drop suffixes
+(`有限公司`, `科技`), and short fragments collide across companies — a 2-character
+fragment will match unrelated rows.
+
+Companies already contacted under a **different job posting** do not get a new
+row; the button may still read 立即沟通 while no new conversation appears. Record
+these as `UNVERIFIED-not-in-list` rather than resending.
+
+## Blocking by company name does not work on its own
+
+Brands post under legal entity names, so a blocklist of brand strings misses
+them. Observed misses: 拼多多 jobs listed under 上海从鲸信息技术; 阿里巴巴 jobs
+under 淘宝, 天猫, 蚂蚁集团. Also worth blocking separately: outsourcing
+suppliers such as 中软国际, 中科软, 太极股份.
+
+Keep both an exact-name list (`blockedCompanies`) and a regex list
+(`blockedCompanyPatterns`) and test against company **plus** job title.
 
 ## Rate limiting and risk control
 
