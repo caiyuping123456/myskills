@@ -71,3 +71,25 @@ Download `skill-boss-job-apply.zip`, extract it and keep `boss-job-apply/SKILL.m
 ## Validation scope
 
 The CLI currently filters size/salary, not education. Use the extension education panel or manually verify each job before outreach. Click-only delivery reporting and automatic retries are not evidence of a sent message; review the target conversation and exact outgoing text.
+
+
+## Excel 投递汇总
+
+每轮投递结束（或手动停止）后，Skill 会先询问 Excel 保存位置，再写入文件：
+
+- 直接回车：保存到进度目录下的 `投递记录-YYYY-MM-DD.xlsx`
+- 输入 `skip`：本次不导出
+- 非交互式运行：必须显式传入 `--excel <路径>`，否则不会写文件
+
+命令行：
+
+```powershell
+node scripts/apply-jobs.mjs scripts/config.json --excel "D:\桌面\投递记录-2026-10-25.xlsx"
+node scripts/export-excel.mjs scripts/out/apply-progress.json --output "D:\桌面\投递记录-2026-10-25.xlsx" --no-prompt
+```
+
+表格列：序号、公司名称、岗位名称、薪资、城市、公司规模、学历要求、投递日期、投递状态、结果说明、岗位链接。
+
+状态包括：已投递（已确认）、已投递（未确认）、未确认（聊天列表未找到）、失败、已沟通过、仅支持官网投递、试运行（未发送）、跳过（公司规模/学历/薪资）。
+
+导出脚本不会读取浏览器 Cookie、账号密码或聊天内容，只读取本地 `apply-progress.json`。

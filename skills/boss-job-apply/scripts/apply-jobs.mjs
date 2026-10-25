@@ -107,7 +107,14 @@ for (const job of candidates) {
   }
 
   const decision = qualifies(info);
-  const record = { ...job, size: info.size, salary: info.salary, button: info.button };
+  const record = {
+    ...job,
+    size: info.size,
+    salary: info.salary,
+    education: info.education || '',
+    button: info.button,
+    attemptedAt: new Date().toISOString(),
+  };
 
   if (!decision.ok) {
     state.results.push({ ...record, skipped: decision.why });
@@ -189,3 +196,26 @@ for (const r of state.results) {
   tally[key] = (tally[key] || 0) + 1;
 }
 console.log(JSON.stringify({ applied: state.applied, checked: state.checked.length, tally }, null, 2));
+
+// Excel summary: always ask for a destination before writing. Non-interactive
+// runs must pass --excel <path>; nothing is written silently.
+if (!opts.noExcel) {
+  let target = opts.excel;
+  if (!target) {
+    target = await promptForOutputPath(nextDefaultPath(progressFile));
+    if (!target) {
+      console.error('未保存 Excel：当前不是交互式终端。请先询问用户保存位置，再运行：');
+      console.error('  node scripts/export-excel.mjs ' + progressFile + ' --output <路径> --no-prompt');
+    }
+  }
+  if (target && target !== 'skip') {
+    try {
+      const result = await exportProgress(progressFile, target);
+      console.log('Excel 已保存：' + result.file + '（' + result.rows + ' 行）');
+    } catch (e) {
+      console.error('Excel 导出失败：' + (e.message || e));
+    }
+  } else if (target === 'skip') {
+    console.log('已跳过 Excel 导出。');
+  }
+}

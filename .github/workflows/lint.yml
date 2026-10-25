@@ -39,5 +39,10 @@ jobs:
           done < <(find chrome-extensions skills \( -name '*.js' -o -name '*.mjs' \) -type f 2>/dev/null | sort -u)
           exit $fail
 
-      - name: Education regression tests
+      - name: Education and Excel regression tests
         run: node --test tests/*.test.mjs
+
+      - name: Packaging and Excel file tests
+        run: |
+          python tests/package_test.py
+          python tests/excel_test.py

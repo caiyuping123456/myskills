@@ -86,3 +86,8 @@ unzip it and load the folder via `chrome://extensions`.
 | Other local agents | Import the whole SKILL.md folder, or explicitly read it and run scripts locally |
 
 These are import paths, not a claim of end-to-end certification in each agent. See the skill compatibility guide for sources and limitations. Installed `.codex/`, `.claude/` and `.gemini/` directories are not modified by this change.
+
+
+### Excel 投递汇总
+
+`boss-job-apply` 在每轮投递结束后会生成 Excel 汇总（公司、岗位、薪资、城市、公司规模、学历要求、投递日期、状态、结果说明、岗位链接）。保存前会先询问保存位置；非交互式运行必须通过 `--excel <路径>` 指定，否则不会写文件。

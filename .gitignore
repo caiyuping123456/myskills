@@ -16,3 +16,7 @@ Thumbs.db
 dist/
 __pycache__/
 *.pyc
+
+# IDE local state
+.idea/
+.vscode/

@@ -25,7 +25,8 @@ This is a portable Agent Skill: read this file, then run the bundled local scrip
 5. **Sending sends the account's saved greeting, not `config.greeting`.** Clicking 立即沟通 delivers the wording stored in the BOSS app immediately, with no typing step. Confirm with the user that the app's saved greeting matches what they approved before running; the script cannot change the text.
 6. Sending requires explicit user authorization for this run. Verify delivery against the conversation list (`[送达]`/`[已读]` on the company's row), not by counting clicks. Do not count a button click, an unread counter, or matching text elsewhere in the chat list as a delivered application.
 7. Stop on a changed recipient, missing details, unexpected navigation, login/captcha/risk-control page, ambiguous delivery or repeated errors. Save uncertain items as pending manual review; never automatically resend them — a retry can deliver a duplicate greeting.
-8. Report verified **unique new greetings**, prior contacts, skipped jobs, unknown outcomes and unmet target separately. Never describe a greeting as an attachment resume submission. Jobs whose button reads 立即网申 are not messageable at all — report them as needing a manual application.
+8. **Export an Excel summary** with 序号, 公司名称, 岗位名称, 薪资, 城市, 公司规模, 学历要求, 投递日期, 投递状态, 结果说明, 岗位链接. Before writing, you MUST ask the user where to save it. Use the interactive prompt, or pass the confirmed path as `--excel <absolute-path>`. In non-interactive runs, never write silently and never invent a location; use `node scripts/export-excel.mjs <progress.json> --output <path> --no-prompt` only after the user answers.
+9. Report verified **unique new greetings**, prior contacts, skipped jobs, unknown outcomes and unmet target separately. Never describe a greeting as an attachment resume submission. Jobs whose button reads 立即网申 are not messageable at all — report them as needing a manual application.
 
 ## Running and installation
 
@@ -40,5 +41,7 @@ The same SKILL.md, scripts/ and references/ are used for all agents. See [agent-
 - scripts/launch-edge.ps1: dedicated loopback debug browser; user logs in.
 - scripts/collect-candidates.mjs: candidate collection.
 - scripts/apply-jobs.mjs: company-size / salary / education / blocklist outreach with delivery verification. Use `--dry-run` first; requires explicit authorization.
+- scripts/export-excel.mjs: writes the Excel summary; `--output` is mandatory when non-interactive.
+- scripts/xlsx.mjs: dependency-free XLSX writer.
 - scripts/config.example.json: sample parameters. `greeting` must match the greeting saved in the BOSS app, since that is what 立即沟通 sends.
 - agents/openai.yaml: optional metadata, not a portability requirement.
